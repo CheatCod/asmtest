@@ -1,10 +1,8 @@
 extern crate execute;
 
-
-
 use text_io::read;
 
-use rand::{prelude::*};
+use rand::prelude::*;
 use rand_derive2::RandGen;
 #[derive(RandGen)]
 
@@ -49,7 +47,7 @@ impl Instruction {
         } else {
             Intermedian::S(
                 symTable
-                    .get(thread_rng().gen_range(1..(symTable.len())) - 1)
+                    .get(thread_rng().gen_range(0..symTable.len()))
                     .unwrap()
                     .clone(),
             )
@@ -57,7 +55,8 @@ impl Instruction {
         match self {
             Instruction::WORD => {
                 format!(
-                    ".word {}\n",
+                    "{}.word {}\n",
+                    ret,
                     thread_rng().gen_range(-2147483648..2147483647)
                 )
             }
@@ -175,14 +174,18 @@ fn main() {
     let mut lables: Vec<String> = vec![];
     let mut sym_table: Vec<String> = vec![];
 
+    // for _ in 0..100 {
+    //     sym_table.push(getRandomLabel());
+    // }
+
     for _ in 0..num_lines {
         lables = vec![];
         // if a line should have label
         if thread_rng().gen_range(0..5) == 0 {
             let num_labels = thread_rng().gen_range(1..10);
+            let mut s = "".to_string();
             for _ in 0..num_labels {
-                let s = getRandomLabel();
-                sym_table.push(s.clone());
+                s = getRandomLabel();
                 lables.push(s.clone());
             }
             // if the line is null
@@ -194,8 +197,11 @@ fn main() {
                 println!("{}", ret);
                 continue;
             }
-
+            sym_table.push(s.clone());
         }
-        print!("{}", Instruction::get_next().get_string(&lables, &sym_table));
+        print!(
+            "{}",
+            Instruction::get_next().get_string(&lables, &sym_table)
+        );
     }
 }
